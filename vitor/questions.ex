@@ -40,40 +40,44 @@ defmodule Questions do
 
   # 6
   @spec take(list(), integer()) :: list()
-  def take([],_), do: []
+  def take([], _), do: []
   def take(_, 0), do: []
-  def take([head | tail], n), do: [head | take(tail, n-1)]
+  def take([head | tail], n), do: [head | take(tail, n - 1)]
 
   # 7
-  @spec drop(list(),integer()) :: list()
-  def drop([],_), do: []
-  def drop(list,0), do: list
-  def drop([_|tail], n), do: drop(tail,n-1)
+  @spec drop(list(), integer()) :: list()
+  def drop([], _), do: []
+  def drop(list, 0), do: list
+  def drop([_ | tail], n), do: drop(tail, n - 1)
 
   # 8
   @spec zip(list(), list()) :: list()
-  def zip([],_), do: []
-  def zip(_,[]), do: []
-  def zip([a | b], [c | d]), do: [{a,c} | zip(b,d)]
+  def zip([], _), do: []
+  def zip(_, []), do: []
+  def zip([a | b], [c | d]), do: [{a, c} | zip(b, d)]
 
   # 9
   # Numbers between 7 and 14 not working
-  @spec replicate(integer(),integer()) :: list(integer())
-  def replicate(0,_), do: []
-  def replicate(n,x), do: [x | replicate(n-1,x)]
+  @spec replicate(integer(), integer()) :: list(integer())
+  def replicate(0, _), do: []
+  def replicate(n, x), do: [x | replicate(n - 1, x)]
 
   # 10
   # Define Generic types ?
   # Alias for list ?
-  @spec intersperse(list(integer()),integer()) :: list(integer())
+  @spec intersperse(list(integer()), integer()) :: list(integer())
   def intersperse([], _), do: []
-  def intersperse([head | tail],x) do
+
+  def intersperse([head | tail], x) do
     l = length([head | tail])
+
     cond do
       l > 2 ->
-        [head | [x | intersperse(tail,x)]]
+        [head | [x | intersperse(tail, x)]]
+
       l == 2 ->
         [head | [x | tail]]
+
       true ->
         [head | tail]
     end
@@ -82,11 +86,13 @@ defmodule Questions do
   # 11
   @spec group(list()) :: list(list())
   def group([]), do: []
+
   def group([head | tail]) do
-     [auxgroup([head | tail], head) | Enum.drop_while(tail, fn(t) -> t == head end) |> group()]
+    [auxgroup([head | tail], head) | Enum.drop_while(tail, fn t -> t == head end) |> group()]
   end
 
   defp auxgroup([], _), do: []
+
   defp auxgroup([head | tail], x) do
     if head == x do
       [head | auxgroup(tail, x)]
@@ -99,5 +105,6 @@ defmodule Questions do
   @spec otherconcat(list(list())) :: list()
   # def otherconcat(list), do: List.flatten(list)
   def otherconcat([]), do: []
-  def otherconcat([head | tail]), do: head ++ otherconcat(tail) # Is there any faster way?
+  # Is there any faster way?
+  def otherconcat([head | tail]), do: head ++ otherconcat(tail)
 end
