@@ -2,10 +2,15 @@ defmodule Questions do
   # 1
   @spec enumFromTo(integer(), integer()) :: list(integer())
   def enumFromTo(first, last) do
-    unless first > last do
-      [first | enumFromTo(first + 1, last)]
-    else
-      []
+    cond do
+      first > last ->
+        [first | enumFromTo(first - 1, last)]
+
+      first < last ->
+        [first | enumFromTo(first + 1, last)]
+
+      true ->
+        [first]
     end
   end
 
@@ -22,7 +27,6 @@ defmodule Questions do
   # 3
   @spec concat(list(), list()) :: list()
   def concat([], list), do: list
-  # def concat(a, b), do: [a|b] -> Needs to be recursive
   def concat([head | tail], list), do: [head | concat(tail, list)]
 
   # 4
@@ -63,9 +67,8 @@ defmodule Questions do
   def replicate(n, x), do: [x | replicate(n - 1, x)]
 
   # 10
-  # Define Generic types ?
   # Alias for list ?
-  @spec intersperse(list(integer()), integer()) :: list(integer())
+  @spec intersperse(list(any()), any()) :: list(any())
   def intersperse([], _), do: []
 
   def intersperse([head | tail], x) do
@@ -105,6 +108,129 @@ defmodule Questions do
   @spec otherconcat(list(list())) :: list()
   # def otherconcat(list), do: List.flatten(list)
   def otherconcat([]), do: []
-  # Is there any faster way?
-  def otherconcat([head | tail]), do: head ++ otherconcat(tail)
+  def otherconcat([head | tail]), do: concat(head, otherconcat(tail))
+
+  # 13
+  @spec inits(list()) :: list(list())
+  def inits([]), do: [[]]
+
+  def inits(list) do
+    list
+    |> List.pop_at(-1)
+    |> elem(1)
+    |> inits()
+    |> List.insert_at(-1, list)
+  end
+
+  # 14
+  @spec tails(list()) :: list(list())
+  def tails([]), do: [[]]
+  def tails([head | tail]), do: [[head | tail] | tails(tail)]
+
+  # 15
+  @spec heads(list(list)) :: list()
+  def heads([]), do: []
+
+  def heads([head | tail]) do
+    unless List.first(head) == nil do
+      [List.first(head) | heads(tail)]
+    else
+      heads(tail)
+    end
+  end
+
+  # 16
+  @spec total(list(list)) :: integer()
+  def total([]), do: 0
+  # def total(list), do: List.flatten(list) |> length()
+  def total([head | tail]), do: length(head) + total(tail)
+
+  # 17
+  @spec fun(list(tuple())) :: list(tuple())
+  def fun([]), do: []
+  def fun([{x, _, y} | tail]), do: [{x, y} | fun(tail)]
+
+  # 18
+  @spec cola(list(tuple())) :: charlist()
+  def cola([]), do: ""
+  def cola([{str, _, _} | tail]), do: str <> cola(tail)
+
+  # 19
+  @spec idade(list(tuple), integer(), integer()) :: list(charlist())
+  def idade([], _, _), do: []
+
+  def idade([{name, year} | tail], current, age) do
+    unless current - year < age do
+      [name | idade(tail, current, age)]
+    else
+      idade(tail, current, age)
+    end
+  end
+
+  # 20
+  @spec powerEnumFrom(integer(), integer()) :: list(integer())
+  def powerEnumFrom(_, 0), do: []
+
+  def powerEnumFrom(base, exp) do
+    base
+    |> powerEnumFrom(exp - 1)
+    |> List.insert_at(-1, Integer.pow(base, exp - 1))
+  end
+
+  # 21
+  @spec isPrime(integer()) :: boolean()
+  def isPrime(2), do: true
+
+  def isPrime(number) do
+    number
+    |> :math.sqrt()
+    |> round()
+    |> enumFromTo(2)
+    |> Enum.filter(fn x -> Integer.mod(number, x) == 0 end)
+    |> Enum.empty?()
+  end
+
+  # 22
+  @spec isPrefixOf(list(), list()) :: boolean()
+  def isPrefixOf([], _), do: true
+
+  def isPrefixOf([x | y], [z | w]) do
+    unless x != z do
+      isPrefixOf(y, w)
+    else
+      false
+    end
+  end
+
+  # 23
+  @spec isSuffixOf(list(), list()) :: boolean()
+  def isSuffixOf(a, b), do: isPrefixOf(reverse(a), reverse(b))
+
+  # 24
+  @spec isSubsequenceOf(list(), list()) :: boolean()
+  def isSubsequenceOf([], _), do: true
+  def isSubsequenceOf(_, []), do: false
+
+  def isSubsequenceOf([x | y], [z | w]) do
+    unless x != z do
+      isSubsequenceOf(y, w)
+    else
+      isSubsequenceOf([x | y], w)
+    end
+  end
+
+  # 25
+  @spec elemIndices(list(any()), any()) :: list(integer())
+  def elemIndices([], _), do: []
+  def elemIndices(lst, x), do: auxelem(lst, x, 0)
+
+  defp auxelem([], _, _), do: []
+
+  defp auxelem([head | tail], x, acc) do
+    if head == x do
+      [acc | auxelem(tail, x, acc + 1)]
+    else
+      auxelem(tail, x, acc + 1)
+    end
+  end
 end
