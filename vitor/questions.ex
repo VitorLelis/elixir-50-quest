@@ -37,10 +37,10 @@ defmodule Questions do
 
   # 5
   @spec reverse(list()) :: list()
-  def reverse(list), do: do_reverse(list, [])
+  def reverse(list), do: aux_reverse(list, [])
 
-  defp do_reverse([], acc), do: acc
-  defp do_reverse([head | tail], acc), do: do_reverse(tail, [head | acc])
+  defp aux_reverse([], acc), do: acc
+  defp aux_reverse([head | tail], acc), do: aux_reverse(tail, [head | acc])
 
   # 6
   @spec take(list(), integer()) :: list()
@@ -67,7 +67,6 @@ defmodule Questions do
   def replicate(n, x), do: [x | replicate(n - 1, x)]
 
   # 10
-  # Alias for list ?
   @spec intersperse(list(any()), any()) :: list(any())
   def intersperse([], _), do: []
   def intersperse([_] = singl,  _), do: singl
@@ -78,26 +77,27 @@ defmodule Questions do
   def group([]), do: []
 
   def group([head | tail]) do
-    [do_group([head | tail], head) | tail |> Enum.drop_while(& &1 == head) |> group()]
+    [aux_group([head | tail], head) | Enum.drop_while(tail, fn t -> t == head end) |> group()]
   end
 
-  defp do_group([head | tail], x) when head == x, do: [head | do_group(tail, x)]
-  defp do_group(_, _), do: []
+  defp aux_group([head | tail], x) when head == x, do: [head | aux_group(tail, x)]
+  defp aux_group(_, _), do: []
 
   # 12
   @spec otherconcat(list(list())) :: list()
+  # def otherconcat(list), do: List.flatten(list)
   def otherconcat([]), do: []
   def otherconcat([head | tail]), do: concat(head, otherconcat(tail))
 
   # 13
   @spec inits(list()) :: list(list())
-  def inits(list), do: do_inits(list, [list])
+  def inits(list), do: aux_inits(list, [list])
 
-  defp do_inits([], acc), do: acc
+  defp aux_inits([], acc), do: acc
 
-  defp do_inits(list, acc) do
+  defp aux_inits(list, acc) do
     init = Enum.drop(list, -1)
-    do_inits(init, [init | acc])
+    aux_inits(init, [init | acc])
   end
 
   # 14
@@ -113,6 +113,7 @@ defmodule Questions do
 
   # 16
   @spec total(list(list)) :: integer()
+  # def total(list), do: List.flatten(list) |> length()
   def total([]), do: 0
   def total([head | tail]), do: length(head) + total(tail)
 
@@ -150,13 +151,13 @@ defmodule Questions do
 
   # 21
   @spec prime?(integer()) :: boolean()
-  def prime?(number), do: number >= 2 and do_prime?(number, 2)
+  def prime?(number), do: number >= 2 and aux_prime?(number, 2)
 
-  defp do_prime?(n, m) do
+  defp aux_prime?(n, m) do
     cond do
       m * m > n -> true
       rem(n, m) == 0 -> false
-      true -> do_prime?(n, m + 1)
+      true -> aux_prime?(n, m + 1)
     end
   end
 
@@ -186,15 +187,15 @@ defmodule Questions do
   # 25
   @spec elem_indices(list(any()), any()) :: list(integer())
   def elem_indices([], _), do: []
-  def elem_indices(list, x), do: do_elem_indices(list, x, 0)
+  def elem_indices(list, x), do: aux_elem_indices(list, x, 0)
 
-  defp do_elem_indices([], _, _), do: []
+  defp aux_elem_indices([], _, _), do: []
 
-  defp do_elem_indices([head | tail], x, acc) do
+  defp aux_elem_indices([head | tail], x, acc) do
     if head == x do
-      [acc | do_elem_indices(tail, x, acc + 1)]
+      [acc | aux_elem_indices(tail, x, acc + 1)]
     else
-      do_elem_indices(tail, x, acc + 1)
+      aux_elem_indices(tail, x, acc + 1)
     end
   end
 end
