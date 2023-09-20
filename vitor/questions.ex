@@ -1,13 +1,13 @@
 defmodule Questions do
   # 1
-  @spec enumFromTo(integer(), integer()) :: list(integer())
-  def enumFromTo(first, last) do
+  @spec enum_from_to(integer(), integer()) :: list(integer())
+  def enum_from_to(first, last) do
     cond do
       first > last ->
-        [first | enumFromTo(first - 1, last)]
+        [first | enum_from_to(first - 1, last)]
 
       first < last ->
-        [first | enumFromTo(first + 1, last)]
+        [first | enum_from_to(first + 1, last)]
 
       true ->
         [first]
@@ -15,10 +15,10 @@ defmodule Questions do
   end
 
   # 2
-  @spec enumFromThenTo(integer(), integer(), integer()) :: list(integer())
-  def enumFromThenTo(first, next, last) do
+  @spec enum_from_then_to(integer(), integer(), integer()) :: list(integer())
+  def enum_from_then_to(first, next, last) do
     if (first < next and first < last) or (first > next and first > last) do
-      [first | enumFromThenTo(next, 2 * next - first, last)]
+      [first | enum_from_then_to(next, 2 * next - first, last)]
     else
       []
     end
@@ -37,10 +37,10 @@ defmodule Questions do
 
   # 5
   @spec reverse(list()) :: list()
-  def reverse(list), do: do_reverse(list, [])
+  def reverse(list), do: aux_reverse(list, [])
 
-  defp do_reverse([], acc), do: acc
-  defp do_reverse([head | tail], acc), do: do_reverse(tail, [head | acc])
+  defp aux_reverse([], acc), do: acc
+  defp aux_reverse([head | tail], acc), do: aux_reverse(tail, [head | acc])
 
   # 6
   @spec take(list(), integer()) :: list()
@@ -67,42 +67,21 @@ defmodule Questions do
   def replicate(n, x), do: [x | replicate(n - 1, x)]
 
   # 10
-  # Alias for list ?
   @spec intersperse(list(any()), any()) :: list(any())
   def intersperse([], _), do: []
-
-  def intersperse([head | tail], x) do
-    l = length([head | tail])
-
-    cond do
-      l > 2 ->
-        [head | [x | intersperse(tail, x)]]
-
-      l == 2 ->
-        [head | [x | tail]]
-
-      true ->
-        [head | tail]
-    end
-  end
+  def intersperse([_] = singl,  _), do: singl
+  def intersperse([head | tail], x), do: [head, x | intersperse(tail, x)]
 
   # 11
   @spec group(list()) :: list(list())
   def group([]), do: []
 
   def group([head | tail]) do
-    [auxgroup([head | tail], head) | Enum.drop_while(tail, fn t -> t == head end) |> group()]
+    [aux_group([head | tail], head) | Enum.drop_while(tail, fn t -> t == head end) |> group()]
   end
 
-  defp auxgroup([], _), do: []
-
-  defp auxgroup([head | tail], x) do
-    if head == x do
-      [head | auxgroup(tail, x)]
-    else
-      []
-    end
-  end
+  defp aux_group([head | tail], x) when head == x, do: [head | aux_group(tail, x)]
+  defp aux_group(_, _), do: []
 
   # 12
   @spec otherconcat(list(list())) :: list()
@@ -112,37 +91,30 @@ defmodule Questions do
 
   # 13
   @spec inits(list()) :: list(list())
-  def inits([]), do: [[]]
+  def inits(list), do: aux_inits(list, [list])
 
-  def inits(list) do
-    list
-    |> List.pop_at(-1)
-    |> elem(1)
-    |> inits()
-    |> List.insert_at(-1, list)
+  defp aux_inits([], acc), do: acc
+
+  defp aux_inits(list, acc) do
+    init = Enum.drop(list, -1)
+    aux_inits(init, [init | acc])
   end
 
   # 14
   @spec tails(list()) :: list(list())
   def tails([]), do: [[]]
-  def tails([head | tail]), do: [[head | tail] | tails(tail)]
+  def tails([_ | tail] = list), do: [list | tails(tail)]
 
   # 15
-  @spec heads(list(list)) :: list()
+  @spec heads(list(list())) :: list()
   def heads([]), do: []
-
-  def heads([head | tail]) do
-    unless List.first(head) == nil do
-      [List.first(head) | heads(tail)]
-    else
-      heads(tail)
-    end
-  end
+  def heads([[head | _] | tail]), do: [head | heads(tail)]
+  def heads([_ | tail]), do: heads(tail)
 
   # 16
   @spec total(list(list)) :: integer()
-  def total([]), do: 0
   # def total(list), do: List.flatten(list) |> length()
+  def total([]), do: 0
   def total([head | tail]), do: length(head) + total(tail)
 
   # 17
@@ -168,69 +140,62 @@ defmodule Questions do
   end
 
   # 20
-  @spec powerEnumFrom(integer(), integer()) :: list(integer())
-  def powerEnumFrom(_, 0), do: []
+  @spec power_enum_from(integer(), integer()) :: list(integer())
+  def power_enum_from(_, 0), do: []
 
-  def powerEnumFrom(base, exp) do
+  def power_enum_from(base, exp) do
     base
-    |> powerEnumFrom(exp - 1)
+    |> power_enum_from(exp - 1)
     |> List.insert_at(-1, Integer.pow(base, exp - 1))
   end
 
   # 21
-  @spec isPrime(integer()) :: boolean()
-  def isPrime(2), do: true
+  @spec prime?(integer()) :: boolean()
+  def prime?(number), do: number >= 2 and aux_prime?(number, 2)
 
-  def isPrime(number) do
-    number
-    |> :math.sqrt()
-    |> round()
-    |> enumFromTo(2)
-    |> Enum.filter(fn x -> Integer.mod(number, x) == 0 end)
-    |> Enum.empty?()
-  end
-
-  # 22
-  @spec isPrefixOf(list(), list()) :: boolean()
-  def isPrefixOf([], _), do: true
-
-  def isPrefixOf([x | y], [z | w]) do
-    unless x != z do
-      isPrefixOf(y, w)
-    else
-      false
+  defp aux_prime?(n, m) do
+    cond do
+      m * m > n -> true
+      rem(n, m) == 0 -> false
+      true -> aux_prime?(n, m + 1)
     end
   end
 
+  # 22
+  @spec prefix_of?(list(), list()) :: boolean()
+  def prefix_of?([], _), do: true
+  def prefix_of?([x | xs], [y | ys]), do: x == y and prefix_of?(xs, ys)
+
   # 23
-  @spec isSuffixOf(list(), list()) :: boolean()
-  def isSuffixOf(a, b), do: isPrefixOf(reverse(a), reverse(b))
+  @spec suffix_of?(list(), list()) :: boolean()
+  def suffix_of?(a, b), do: prefix_of?(reverse(a), reverse(b))
 
   # 24
-  @spec isSubsequenceOf(list(), list()) :: boolean()
-  def isSubsequenceOf([], _), do: true
-  def isSubsequenceOf(_, []), do: false
+  @spec subsequence_of?(list(), list()) :: boolean()
+  def subsequence_of?([], _), do: true
 
-  def isSubsequenceOf([x | y], [z | w]) do
-    unless x != z do
-      isSubsequenceOf(y, w)
+  def subsequence_of?(_, []), do: false
+
+  def subsequence_of?([x | xs], [y | ys]) do
+    if x == y do
+      subsequence_of?(xs, ys)
     else
-      isSubsequenceOf([x | y], w)
+      subsequence_of?([x | xs], ys)
     end
   end
 
   # 25
-  @spec elemIndices(list(any()), any()) :: list(integer())
-  def elemIndices([], _), do: []
-  def elemIndices(lst, x), do: auxelem(lst, x, 0)
+  @spec elem_indices(list(any()), any()) :: list(integer())
+  def elem_indices([], _), do: []
+  def elem_indices(list, x), do: aux_elem_indices(list, x, 0)
 
-  defp auxelem([], _, _), do: []
+  defp aux_elem_indices([], _, _), do: []
 
-  defp auxelem([head | tail], x, acc) do
+  defp aux_elem_indices([head | tail], x, acc) do
     if head == x do
-      [acc | auxelem(tail, x, acc + 1)]
+      [acc | aux_elem_indices(tail, x, acc + 1)]
     else
-      auxelem(tail, x, acc + 1)
+      aux_elem_indices(tail, x, acc + 1)
     end
   end
 end
