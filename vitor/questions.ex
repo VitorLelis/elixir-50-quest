@@ -198,4 +198,60 @@ defmodule Questions do
       aux_elem_indices(tail, x, acc + 1)
     end
   end
+
+  # 26
+  @spec nub(list(any())) :: list(any())
+  def nub([]), do: []
+
+  def nub([head | _] = list) do
+    [head | Enum.filter(list, fn x -> x != head end) |> nub()]
+  end
+
+  # 27
+  @spec delete(list(any()),any()) :: list(any())
+  def delete([], _), do: []
+
+  def delete([head | tail], x) do
+    if head == x do
+      tail
+    else
+      [head | delete(tail, x)]
+    end
+  end
+
+  # 28
+  @spec delete_list(list(any()) , list(any())) :: list(any())
+  def delete_list([], _), do: []
+
+  def delete_list(list, []), do: list
+
+  def delete_list(list, [head | tail]) do
+    list
+    |> delete(head)
+    |> delete_list(tail)
+  end
+
+  # 29
+  @spec union(list(any()), list(any())) :: list(any())
+  def union([], list), do: list
+
+  def union(list, []), do: list
+
+  def union([x | xs], [y| ys]) do
+    if x == y do
+      union([x | xs], ys)
+    else
+      [x | union(xs, [y | ys])]
+    end
+  end
+
+  # 30
+  @spec intersect(list(any()), list(any())) :: list(any())
+  def intersect([], _), do: []
+
+  def intersect(_, []), do: []
+
+  def intersect(list, [head | tail]) do 
+    [Enum.filter(list, fn x -> x == head end) | intersect(list, tail)] |> List.flatten()
+  end
 end
