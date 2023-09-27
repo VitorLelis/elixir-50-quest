@@ -260,10 +260,10 @@ defmodule Questions do
   def insert([], x), do: [x]
 
   def insert([head | tail] = list, x) do
-    if head >= x do
-      [x | list]
-    else
+    unless head > x do
       [head | insert(tail, x)]
+    else
+      [x | list]
     end
   end
 
@@ -274,4 +274,89 @@ defmodule Questions do
   def unword([str]), do: str
 
   def unword([head | tail]), do: head <> " " <> unword(tail)
+
+  # 33
+  @spec unlines(list(charlist())) :: charlist()
+  def unlines([]), do: ""
+
+  def unlines([head | tail]), do: head <> "\n" <> unlines(tail)
+
+  # 34
+  @spec p_maior(list(any())) :: integer()
+
+  def p_maior([]), do: 0
+
+  def p_maior([head | _] = list), do: aux_p_maior(list, head, 0, 0)
+
+  defp aux_p_maior([], _, _, pos), do: pos
+
+  defp aux_p_maior([head | tail], big, acc, pos) do
+    if head > big do
+      aux_p_maior(tail, head, acc + 1, acc)
+    else
+      aux_p_maior(tail, big, acc + 1, pos)
+    end
+  end
+
+  # 35 
+  @spec lookup(list(tuple()), any()) :: any()
+  def lookup([], _), do: nil
+
+  def lookup([{x, y} | tail], z) do
+    unless x == z do
+      lookup(tail, z)
+    else
+      y
+    end
+  end
+
+  # 36
+  @spec pre_crescente(list(any())) :: list(any())
+  def pre_crescente([]), do: []
+
+  def pre_crescente([x, y | tail]) do
+    if x <= y do
+      [x | pre_crescente([y | tail])]
+    else
+      [x]
+    end
+  end
+
+  # 37
+  @spec my_sort(list(any())) :: list(any())
+  def my_sort([]), do: []
+
+  def my_sort([head | tail]), do: my_sort(tail) |> insert(head)
+
+  # 38
+  @spec menor(charlist(), charlist()) :: boolean()
+  def menor([], _), do: true
+
+  def menor([x | y], [z | w]) do
+    unless x > z do
+      menor(y, w)
+    else
+      false
+    end
+  end
+
+  # 39
+  @spec elem_set(list(tuple()), any()) :: boolean()
+  def elem_set([], _), do: false
+
+  def elem_set([{x, _} | tail], ele) do
+    unless x == ele do
+      elem_set(tail, ele)
+    else
+      true
+    end
+  end
+
+  # 40
+  @spec convert_set(list(tuple())) :: any()
+  def convert_set([]), do: ""
+
+  def convert_set([{_, 0} | tail]), do: convert_set(tail)
+
+  def convert_set([{x, n} | tail]), do: x <> convert_set([{x, n - 1} | tail])
 end
