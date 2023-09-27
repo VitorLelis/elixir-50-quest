@@ -69,7 +69,7 @@ defmodule Questions do
   # 10
   @spec intersperse(list(any()), any()) :: list(any())
   def intersperse([], _), do: []
-  def intersperse([_] = singl,  _), do: singl
+  def intersperse([_] = singl, _), do: singl
   def intersperse([head | tail], x), do: [head, x | intersperse(tail, x)]
 
   # 11
@@ -208,7 +208,7 @@ defmodule Questions do
   end
 
   # 27
-  @spec delete(list(any()),any()) :: list(any())
+  @spec delete(list(any()), any()) :: list(any())
   def delete([], _), do: []
 
   def delete([head | tail], x) do
@@ -220,7 +220,7 @@ defmodule Questions do
   end
 
   # 28
-  @spec delete_list(list(any()) , list(any())) :: list(any())
+  @spec delete_list(list(any()), list(any())) :: list(any())
   def delete_list([], _), do: []
 
   def delete_list(list, []), do: list
@@ -237,7 +237,7 @@ defmodule Questions do
 
   def union(list, []), do: list
 
-  def union([x | xs], [y| ys]) do
+  def union([x | xs], [y | ys]) do
     if x == y do
       union([x | xs], ys)
     else
@@ -251,7 +251,27 @@ defmodule Questions do
 
   def intersect(_, []), do: []
 
-  def intersect(list, [head | tail]) do 
+  def intersect(list, [head | tail]) do
     [Enum.filter(list, fn x -> x == head end) | intersect(list, tail)] |> List.flatten()
   end
+
+  # 31
+  @spec insert(list(any()), any()) :: list(any())
+  def insert([], x), do: [x]
+
+  def insert([head | tail] = list, x) do
+    if head >= x do
+      [x | list]
+    else
+      [head | insert(tail, x)]
+    end
+  end
+
+  # 32
+  @spec unword(list(charlist())) :: charlist()
+  def unword([]), do: ""
+
+  def unword([str]), do: str
+
+  def unword([head | tail]), do: head <> " " <> unword(tail)
 end
