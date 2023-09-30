@@ -353,10 +353,154 @@ defmodule Questions do
   end
 
   # 40
-  @spec convert_set(list(tuple())) :: any()
+  @spec convert_set(list(tuple())) :: charlist()
   def convert_set([]), do: ""
 
   def convert_set([{_, 0} | tail]), do: convert_set(tail)
 
   def convert_set([{x, n} | tail]), do: x <> convert_set([{x, n - 1} | tail])
+
+  # 41
+  @spec insert_set(list(tuple()), any()) :: list(tuple())
+  def insert_set([], _), do: []
+
+  def insert_set([{x, n} | tail], elem) do
+    unless x == elem do
+      [{x, n} | insert_set(tail, elem)]
+    else
+      [{x, n} | tail]
+    end
+  end
+
+  # 42
+  @spec remove_set(list(tuple()), any()) :: list(tuple())
+  def remove_set([], _), do: []
+
+  def remove_set([{x, n} | tail], elem) do
+    unless x == elem do
+      [{x, n} | remove_set(tail, elem)]
+    else
+      tail
+    end
+  end
+
+  # 43
+  @spec constroi_set(charlist()) :: list(tuple())
+  def constroi_set([]), do: []
+
+  def constroi_set([head | _] = list) do
+    [aux_constroi_set(list, head, 0) | Enum.filter(list, fn c -> c != head end) |> constroi_set()]
+  end
+
+  defp aux_constroi_set([], x, acc), do: {x, acc}
+
+  defp aux_constroi_set([head | tail], x, acc) do
+    if x == head do
+      aux_constroi_set(tail, x, acc + 1)
+    else
+      aux_constroi_set(tail, x, acc)
+    end
+  end
+
+  # 44
+  @spec partition(list(tuple())) :: tuple()
+  def partition([]), do: {[], []}
+
+  def partition([{"Left", l} | tail]) do
+    {left, right} = partition(tail)
+    {[l | left], right}
+  end
+
+  def partition([{"Right", r} | tail]) do
+    {left, right} = partition(tail)
+    {left, [r | right]}
+  end
+
+  # 45 
+  @spec cat_maybes(list(any())) :: list(any())
+  def cat_maybes([]), do: []
+
+  def cat_maybes(["Nothing" | tail]), do: cat_maybes(tail)
+
+  def cat_maybes([{"Just", a} | tail]), do: [a | cat_maybes(tail)]
+
+  # 46
+  @spec caminho({integer(), integer()}, {integer(), integer()}) :: list(charlist())
+  def caminho({xa, ya}, {xb, yb}) do
+    cond do
+      xa > xb ->
+        ["Este" | caminho({xa - 1, ya}, {xb, yb})]
+
+      xa < xb ->
+        ["Oeste" | caminho({xa + 1, ya}, {xb, yb})]
+
+      ya > yb ->
+        ["Sul" | caminho({xa, ya - 1}, {xb, yb})]
+
+      ya < yb ->
+        ["Norte" | caminho({xa, ya + 1}, {xb, yb})]
+
+      true ->
+        []
+    end
+  end
+
+  # 47
+  @spec has_loop(tuple(), list(charlist())) :: boolean()
+  def has_loop(_, []), do: false
+
+  def has_loop(origin, list) do
+    origin
+    |> aux_has_loop(list)
+    |> has_duplicates?()
+  end
+
+  defp has_duplicates?(list), do: Enum.uniq(list) != list
+
+  defp aux_has_loop({x, y}, []), do: [{x, y}]
+
+  defp aux_has_loop({x, y}, [head | tail]) do
+    case head do
+      "Norte" ->
+        [{x, y} | aux_has_loop({x, y + 1}, tail)]
+
+      "Sul" ->
+        [{x, y} | aux_has_loop({x, y - 1}, tail)]
+
+      "Este" ->
+        [{x, y} | aux_has_loop({x - 1, y}, tail)]
+
+      "Oeste" ->
+        [{x, y} | aux_has_loop({x + 1, y}, tail)]
+    end
+  end
+
+  # 48
+  @spec conta_quadrados(list(tuple())) :: integer()
+  def conta_quadrados([]), do: 0
+
+  def conta_quadrados([{{xa, ya}, {xb, yb}} | tail]) do
+    if abs(xa - xb) == abs(ya - yb) do
+      1 + conta_quadrados(tail)
+    else
+      conta_quadrados(tail)
+    end
+  end
+
+  # 49
+  @spec area_total(list(tuple())) :: float()
+  def area_total([]), do: 0.0
+
+  def area_total([{{xa, ya}, {xb, yb}} | tail]) do
+    abs(xa - xb) * abs(ya - yb) + area_total(tail)
+  end
+
+  # 50
+  @spec nao_reparar(list(charlist())) :: integer()
+
+  def nao_reparar([]), do: 0
+
+  def nao_reparar(["Avariado" | tail]), do: nao_reparar(tail)
+
+  def nao_reparar([_ | tail]), do: 1 + nao_reparar(tail)
 end
