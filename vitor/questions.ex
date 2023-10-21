@@ -204,20 +204,14 @@ defmodule Questions do
   def nub([]), do: []
 
   def nub([head | _] = list) do
-    [head | Enum.filter(list, fn x -> x != head end) |> nub()]
+    [head | list |> Enum.filter(fn x -> x != head end) |> nub()]
   end
 
   # 27
   @spec delete(list(any()), any()) :: list(any())
   def delete([], _), do: []
-
-  def delete([head | tail], x) do
-    if head == x do
-      tail
-    else
-      [head | delete(tail, x)]
-    end
-  end
+  def delete([head | tail], x) when head == x, do: tail
+  def delete([head | tail], x), do: [head | delete(tail, x)]
 
   # 28
   @spec delete_list(list(any()), list(any())) :: list(any())
@@ -237,11 +231,12 @@ defmodule Questions do
 
   def union(list, []), do: list
 
-  def union([x | xs], [y | ys]) do
-    if x == y do
-      union([x | xs], ys)
+  def union(list, [x | xs]) do
+    if x in list do
+      union(list, xs)
     else
-      [x | union(xs, [y | ys])]
+      # is there a faster way?
+      union(concat(list, [x]), xs)
     end
   end
 
@@ -249,10 +244,11 @@ defmodule Questions do
   @spec intersect(list(any()), list(any())) :: list(any())
   def intersect([], _), do: []
 
-  def intersect(_, []), do: []
-
-  def intersect(list, [head | tail]) do
-    [Enum.filter(list, fn x -> x == head end) | intersect(list, tail)] |> List.flatten()
+  def intersect([head | tail], list) do
+    cond do
+      head in list -> [head | intersect(tail, list)]
+      true -> intersect(tail, list)
+    end
   end
 
   # 31
@@ -301,18 +297,14 @@ defmodule Questions do
   # 35 
   @spec lookup(list(tuple()), any()) :: any()
   def lookup([], _), do: nil
-
-  def lookup([{x, y} | tail], z) do
-    unless x == z do
-      lookup(tail, z)
-    else
-      y
-    end
-  end
+  def lookup([{x, y} | _], z) when x == z, do: y
+  def lookup([_ | tail], z), do: lookup(tail, z)
 
   # 36
   @spec pre_crescente(list(any())) :: list(any())
   def pre_crescente([]), do: []
+
+  def pre_crescente([x]), do: [x]
 
   def pre_crescente([x, y | tail]) do
     if x <= y do
@@ -330,33 +322,28 @@ defmodule Questions do
 
   # 38
   @spec menor(charlist(), charlist()) :: boolean()
+  def menor(_, []), do: false
+
   def menor([], _), do: true
 
-  def menor([x | y], [z | w]) do
-    unless x > z do
-      menor(y, w)
-    else
-      false
+  def menor([x | xs], [y | ys]) do
+    cond do
+      x < y -> true
+      x == y -> menor(xs, ys)
+      true -> false
     end
   end
 
   # 39
   @spec elem_set(list(tuple()), any()) :: boolean()
   def elem_set([], _), do: false
-
-  def elem_set([{x, _} | tail], ele) do
-    unless x == ele do
-      elem_set(tail, ele)
-    else
-      true
-    end
-  end
+  def elem_set([{x, _} | tail], elem), do: x == elem or elem_set(tail, elem)
 
   # 40
   @spec convert_set(list(tuple())) :: charlist()
   def convert_set([]), do: ""
 
-  def convert_set([{_, 0} | tail]), do: convert_set(tail)
+  def convert_set([{x, 1} | tail]), do: x <> convert_set(tail)
 
   def convert_set([{x, n} | tail]), do: x <> convert_set([{x, n - 1} | tail])
 
