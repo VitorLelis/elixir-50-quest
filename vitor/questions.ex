@@ -61,7 +61,6 @@ defmodule Questions do
   def zip([a | b], [c | d]), do: [{a, c} | zip(b, d)]
 
   # 9
-  # Numbers between 7 and 14 not working
   @spec replicate(integer(), integer()) :: list(integer())
   def replicate(0, _), do: []
   def replicate(n, x), do: [x | replicate(n - 1, x)]
@@ -113,7 +112,7 @@ defmodule Questions do
 
   # 16
   @spec total(list(list)) :: integer()
-  # def total(list), do: List.flatten(list) |> length()
+  # def total(list), do: list |> List.flatten() |> length()
   def total([]), do: 0
   def total([head | tail]), do: length(head) + total(tail)
 
@@ -318,7 +317,7 @@ defmodule Questions do
   @spec my_sort(list(any())) :: list(any())
   def my_sort([]), do: []
 
-  def my_sort([head | tail]), do: my_sort(tail) |> insert(head)
+  def my_sort([head | tail]), do: tail |> my_sort() |> insert(head)
 
   # 38
   @spec menor(charlist(), charlist()) :: boolean()
@@ -349,13 +348,13 @@ defmodule Questions do
 
   # 41
   @spec insert_set(list(tuple()), any()) :: list(tuple())
-  def insert_set([], _), do: []
+  def insert_set([], x), do: [{x,1}]
 
   def insert_set([{x, n} | tail], elem) do
     unless x == elem do
       [{x, n} | insert_set(tail, elem)]
     else
-      [{x, n} | tail]
+      [{x, n+1} | tail]
     end
   end
 
@@ -379,7 +378,7 @@ defmodule Questions do
     [aux_constroi_set(list, head, 0) | Enum.filter(list, fn c -> c != head end) |> constroi_set()]
   end
 
-  defp aux_constroi_set([], x, acc), do: {x, acc}
+  defp aux_constroi_set([], x, acc), do: {<<x::utf8>>, acc}
 
   defp aux_constroi_set([head | tail], x, acc) do
     if x == head do
@@ -416,10 +415,10 @@ defmodule Questions do
   def caminho({xa, ya}, {xb, yb}) do
     cond do
       xa > xb ->
-        ["Este" | caminho({xa - 1, ya}, {xb, yb})]
+        ["Oeste" | caminho({xa - 1, ya}, {xb, yb})]
 
       xa < xb ->
-        ["Oeste" | caminho({xa + 1, ya}, {xb, yb})]
+        ["Este" | caminho({xa + 1, ya}, {xb, yb})]
 
       ya > yb ->
         ["Sul" | caminho({xa, ya - 1}, {xb, yb})]
@@ -433,16 +432,16 @@ defmodule Questions do
   end
 
   # 47
-  @spec has_loop(tuple(), list(charlist())) :: boolean()
-  def has_loop(_, []), do: false
+  @spec has_loop?(tuple(), list(charlist())) :: boolean()
+  def has_loop?(_, []), do: false
 
-  def has_loop(origin, list) do
+  def has_loop?(origin, list) do
     origin
     |> aux_has_loop(list)
-    |> has_duplicates?()
+    |> have_return?(origin)
   end
 
-  defp has_duplicates?(list), do: Enum.uniq(list) != list
+  defp have_return?(list, origin), do: Enum.count(list, fn x -> x == origin end) > 1
 
   defp aux_has_loop({x, y}, []), do: [{x, y}]
 
